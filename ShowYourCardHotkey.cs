@@ -31,22 +31,13 @@ internal static class ShowYourCardHotkey
             return;
         }
 
-        bool changed = false;
         if (!keyboardInputMap.ContainsKey(ToggleOverlayAction))
         {
             keyboardInputMap[ToggleOverlayAction] = DefaultToggleKey;
-            changed = true;
-        }
-
-        if (!changed)
-        {
-            return;
-        }
-
-        SaveKeyboardInputMapping(inputManager);
-        if (emitRebound)
-        {
-            inputManager.EmitSignal(NInputManager.SignalName.InputRebound);
+            if (emitRebound)
+            {
+                inputManager.EmitSignal(NInputManager.SignalName.InputRebound);
+            }
         }
     }
 
@@ -104,12 +95,6 @@ internal static class ShowYourCardHotkey
     {
         FieldInfo? field = typeof(NInputManager).GetField("_keyboardInputMap", BindingFlags.NonPublic | BindingFlags.Instance);
         return field?.GetValue(inputManager) as Dictionary<StringName, Key>;
-    }
-
-    private static void SaveKeyboardInputMapping(NInputManager inputManager)
-    {
-        MethodInfo? method = typeof(NInputManager).GetMethod("SaveKeyboardInputMapping", BindingFlags.NonPublic | BindingFlags.Instance);
-        method?.Invoke(inputManager, null);
     }
 
     private static string L(string key)
