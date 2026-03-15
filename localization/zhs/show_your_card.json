@@ -2,6 +2,7 @@
   "TITLE": "队友手牌",
   "HAND": "手牌",
   "ACTIVE": "当前回合",
+  "HOTKEY_TOGGLE": "切换队友手牌",
   "NO_CARDS": "当前没有手牌",
   "EMPTY": "进入战斗后即可查看队友手牌。"
 }

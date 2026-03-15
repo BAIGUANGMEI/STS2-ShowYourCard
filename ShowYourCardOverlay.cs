@@ -2,6 +2,7 @@ using System.Text.Json;
 using Godot;
 using MegaCrit.Sts2.Core.Entities.Cards;
 using MegaCrit.Sts2.Core.Models;
+using MegaCrit.Sts2.Core.Nodes.CommonUi;
 
 namespace ShowYourCard;
 
@@ -20,6 +21,7 @@ public sealed partial class ShowYourCardOverlay : CanvasLayer
 
     private static ShowYourCardOverlay? _instance;
     private static Dictionary<string, string>? _locStrings;
+    private static bool _overlayVisible = true;
 
     private Control? _root;
     private VBoxContainer? _players;
@@ -53,11 +55,13 @@ public sealed partial class ShowYourCardOverlay : CanvasLayer
         Layer = 100;
         Name = nameof(ShowYourCardOverlay);
         TeammateHandService.Changed += OnChanged;
+        NHotkeyManager.Instance?.PushHotkeyPressedBinding(ShowYourCardHotkey.ToggleOverlayAction.ToString(), ToggleOverlayVisibility);
     }
 
     public override void _ExitTree()
     {
         TeammateHandService.Changed -= OnChanged;
+        NHotkeyManager.Instance?.RemoveHotkeyPressedBinding(ShowYourCardHotkey.ToggleOverlayAction.ToString(), ToggleOverlayVisibility);
         if (ReferenceEquals(_instance, this))
         {
             _instance = null;
@@ -119,6 +123,7 @@ public sealed partial class ShowYourCardOverlay : CanvasLayer
         root.AddChild(pad);
         AddChild(root);
 
+        ApplyOverlayVisibility();
         ApplyState(TeammateHandService.BuildOverlayState());
     }
 
@@ -438,6 +443,23 @@ public sealed partial class ShowYourCardOverlay : CanvasLayer
         if (_lastState != null)
         {
             ApplyState(_lastState);
+        }
+    }
+
+    private static void ToggleOverlayVisibility()
+    {
+        _overlayVisible = !_overlayVisible;
+        if (IsInstanceValid(_instance))
+        {
+            _instance.CallDeferred(nameof(ApplyOverlayVisibility));
+        }
+    }
+
+    private void ApplyOverlayVisibility()
+    {
+        if (_root != null)
+        {
+            _root.Visible = _overlayVisible;
         }
     }
 
